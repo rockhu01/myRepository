@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hu.mm.dao.PermissionDao">
+   <!-- 根据角色id 获得角色列表  List<Permission> selectPermissionByRoleId(Integer id););-->
+    <select id="selectPermissionByRoleId" parameterType="Integer" resultType="Permission">
+        select *
+        from t_permission where t_permission.id in (select permission_id from tr_role_permission where role_id =#{roleId});
+    </select>
+
+</mapper>

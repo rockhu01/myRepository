@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hu.mm.dao.IndustryDao">
+
+    <!--城市下拉列表 List<Industry> findListAll();-->
+    <select id="findListAll" resultType="Industry">
+        select id,name from t_industry
+    </select>
+
+    <!-- 查询企业对应的行业 List<Industry> findByCid(int companyId);-->
+    <select id="findByCid" parameterType="int" resultType="Industry">
+        select id , name
+        from t_industry where id in(select industry_id
+                                    from tr_company_industry where company_id = #{companyId})
+    </select>
+
+</mapper>

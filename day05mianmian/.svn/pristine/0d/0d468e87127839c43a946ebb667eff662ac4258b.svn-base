@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hu.mm.dao.CompanyDao">
+    <!--查询企业  List<Company> findAllList();-->
+    <select id="findAllList" resultMap="findAllListMapId">
+        select city_id,id,short_name
+        from t_company
+    </select>
+
+    <resultMap id="findAllListMapId" type="Company">
+        <id column="id" property="id"/>
+        <result column="city_id" property="cityId"/>
+        <result column="short_name" property="shortName"/>
+        <collection property="industryList" ofType="Industry" select="com.hu.mm.dao.IndustryDao.findByCid" column="id"/>
+    </resultMap>
+
+
+</mapper>

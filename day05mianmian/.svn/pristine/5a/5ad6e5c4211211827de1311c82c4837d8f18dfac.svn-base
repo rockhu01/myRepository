@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hu.mm.dao.QuestionDao">
+
+<!--查询问题总数 Long findTotalQuestion(QueryPageBean pageBean);-->
+    <select id="findTotalQuestion" parameterType="QueryPageBean" resultType="java.lang.Long">
+        select count(*) from t_question q
+        <where>
+            is_classic =0
+            <if test="queryParams!=null and queryParams.courseId!=null ">
+                AND q.course_id = #{queryParams.courseId}
+            </if>
+            <if test="queryParams!=null and queryParams.difficulty!=null ">
+                and q.difficulty = #{queryParams.difficulty}
+            </if>
+            <if test="queryParams!=null and queryParams.type!=null ">
+                and q.type = #{queryParams.type}
+            </if>
+            <if test="queryParams!=null and queryParams.keyWord!=null ">
+                and q.subject like "%"#{queryParams.keyWord}"%"
+            </if>
+        </where>
+    </select>
+
+<!--分页查询题目列表 List<Question> findQuestionList(QueryPageBean pageBean);-->
+    <select id="findQuestionList" parameterType="QueryPageBean" resultType="Question">
+        select (select name from t_course where q.course_id = t_course.id) courseName,
+        create_date createDate,
+        (select username from t_user where q.user_id = t_user.id) creator,
+        difficulty,
+        (select id from t_course where q.course_id = t_course.id  ) id,
+        id+1000 number,
+        status,
+        subject,
+        type,
+        (select count(*) from tr_member_question where q.id = tr_member_question.question_id) usedQty
+        from t_question q
+        <where>
+            is_classic =0
+            <if test="queryParams!=null and queryParams.courseId!=null ">
+              AND q.course_id = #{queryParams.courseId}
+            </if>
+            <if test="queryParams!=null and queryParams.difficulty!=null ">
+                and q.difficulty = #{queryParams.difficulty}
+            </if>
+            <if test="queryParams!=null and queryParams.type!=null ">
+                and q.type = #{queryParams.type}
+            </if>
+            <if test="queryParams!=null and queryParams.keyWord!=null ">
+                and q.subject like "%"#{queryParams.keyWord}"%"
+            </if>
+        </where>
+        limit #{offset},#{pageSize}
+    </select>
+
+
+     <!--新增题目 void add(Question question); 需要获取新增题目之后的题目id-->
+    <insert id="add" parameterType="Question" >
+        <selectKey order="AFTER" resultType="integer" keyProperty="id" >
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        
+        INSERT INTO t_question (subject, type, difficulty, analysis, analysis_video, remark, is_classic, review_status, status, create_date, user_id, company_id, catalog_id,course_id)
+        VALUES (#{subject},#{type},#{difficulty},#{analysis}, #{analysisVideo}, #{remark}, #{isClassic}, #{reviewStatus},#{status}, #{createDate}, #{userId}, #{companyId}, #{catalogId},#{courseId})
+    </insert>
+
+    <!--更新题目-->
+    <update id="update" parameterType="Question">
+    UPDATE t_question
+    set number=#{number},subject=#{subject},type=#{type},difficulty=#{difficulty},analysis=#{analysis},analysis_video=#{analysisVideo},remark=#{remark},company_id=#{companyId},catalog_id=#{catalogId}
+    WHERE id = #{id}
+    </update>
+
+    <!-- 根据审核状态跟新题目信息 void updateByReviewedStatus(Map map);-->
+    <update id="updateByReviewedStatus" parameterType="map">
+        UPDATE  t_question set status = #{status},review_status = #{reviewStatus} where id = #{id}
+    </update>
+
+
+</mapper>

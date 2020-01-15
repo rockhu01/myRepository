@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hu.mm.dao.TagDao">
+    <!--查询目录列表 List<Catalog> selectByCourseId(int courseId);-->
+    <select id="selectByCourseId" parameterType="int" resultType="Tag">
+        select id,name from t_tag where course_id = #{CourseId}
+    </select>
+
+    <!--根据id删除 对应的题目选项void deleteById(Integer id);-->
+    <delete id="deleteById"  parameterType="Integer">
+        delete from tr_question_tag where question_id = #{question}
+    </delete>
+
+    <!--根据questionID增加 题目对应的选项信息 void addTagByQuestionId(Map<String, Object> map);-->
+    <insert id="addTagByQuestionId" parameterType="map">
+        INSERT INTO tr_question_tag (question_id, tag_id) VALUES (#{questionId},#{tagId})
+    </insert>
+</mapper>

@@ -1,0 +1,72 @@
+package com.hu.mm.controller;
+
+import com.alibaba.fastjson.JSON;
+import com.hu.mm.entity.PageResult;
+import com.hu.mm.entity.QueryPageBean;
+import com.hu.mm.entity.Result;
+import com.hu.mm.framework.annotation.Controller;
+import com.hu.mm.framework.annotation.RequestMapping;
+import com.hu.mm.pojo.Course;
+import com.hu.mm.service.CourseService;
+import com.hu.pojo.utils.JsonUtils;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.List;
+
+/**
+ * Project：ssm
+ * Date：2019/12/31
+ * Time：22:44
+ * Description：TODO
+ *
+ * @author huxiongjun
+ * @version 1.0
+ */
+@Controller
+public class CourseController {
+
+    private CourseService courseService = new CourseService();
+
+    /**
+     * 分页查询列表
+     * @param request
+     * @param response
+     * @throws IOException
+     */
+    @RequestMapping("/course/findListByPage")
+    public void findListByPage(HttpServletRequest request , HttpServletResponse response) throws IOException {
+        //1.0获得请求参数
+        try {
+            System.out.println("courseController 收到请求...");
+            QueryPageBean pageBean = JsonUtils.parseJSON2Object(request, QueryPageBean.class);
+            System.out.println(pageBean);
+            System.out.println(pageBean.getCurrentPage());
+            System.out.println(pageBean.getOffset());
+            if (pageBean!=null){
+                //2.0调用业务
+                PageResult pageResult  = courseService.findListByPage(pageBean);
+                //3.0 响应
+                if (pageResult != null ){
+
+                    Result result = new Result(true,"查询成功",pageResult );
+                    System.out.println(JSON.toJSONString(pageResult));
+                    JsonUtils.printResult(response,result );
+                }else {
+                    Result result = new Result(false,"查询失败" );
+                    JsonUtils.printResult(response,result );
+                }
+            }else {
+                Result result = new Result(false,"前端页面错误..." );
+                JsonUtils.printResult(response,result );
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Result result = new Result(false,"服务器错误..." );
+            JsonUtils.printResult(response,result );
+        }
+
+
+    }
+}
